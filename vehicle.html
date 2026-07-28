@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle — Prestige Drive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a class="brand" href="index.html"><span class="mark">P</span>Prestige Drive</a>
+    <nav class="nav-links">
+      <a href="index.html#fleet">Our Fleet</a>
+      <a href="index.html#how">How It Works</a>
+      <a href="index.html#verify">Verification</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="index.html#fleet" class="btn btn-gold">Book Now</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<section class="detail">
+  <div class="container">
+    <a class="back" href="index.html#fleet">← Back to Fleet</a>
+    <div class="detail-grid">
+      <!-- LEFT: gallery + info -->
+      <div>
+        <div class="gallery">
+          <div class="main-photo" id="main-photo"></div>
+        </div>
+        <div class="thumbs" id="thumbs"></div>
+
+        <div style="margin-top:34px">
+          <div class="classname" id="v-class"></div>
+          <h1 id="v-title"></h1>
+          <p class="lead" id="v-lead"></p>
+
+          <div class="spec-grid" id="v-specs"></div>
+
+          <h3 style="font-family:var(--serif);font-size:24px;margin:24px 0 14px">Features &amp; Specifications</h3>
+          <ul class="feature-list" id="v-features"></ul>
+        </div>
+      </div>
+
+      <!-- RIGHT: booking panel -->
+      <div>
+        <div class="book-panel">
+          <div class="price-head">
+            <span class="amt" id="v-price"></span><span class="per">/ day</span>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="pickup">Pickup date</label>
+              <input type="date" id="pickup">
+            </div>
+            <div class="field">
+              <label for="return">Return date</label>
+              <input type="date" id="return">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="location">Pickup location</label>
+            <select id="location">
+              <option>Miami — Main Office</option>
+              <option>Miami International Airport (MIA)</option>
+              <option>Delivery to your address</option>
+            </select>
+          </div>
+
+          <div class="notice" id="notice"></div>
+
+          <div class="summary" id="summary">
+            <div class="line"><span id="s-days"></span><span id="s-subtotal"></span></div>
+            <div class="line"><span>Due now (25% deposit)</span><span id="s-deposit"></span></div>
+            <div class="line total"><span>Rental total</span><span id="s-total"></span></div>
+          </div>
+
+          <button class="btn btn-gold btn-block" id="book-btn" style="margin-top:18px">Reserve This Vehicle</button>
+
+          <div class="verify-note">
+            <span class="ic">🔒</span>
+            <span>After reserving, you'll verify your ID (license + selfie match), e-sign the rental agreement, and pay your deposit online or at pickup.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="check">✓</div>
+    <h3>Reservation Requested!</h3>
+    <p>Your dates are available and held for you.</p>
+    <div class="ref" id="m-ref"></div>
+    <p id="m-dates" style="font-weight:600;color:var(--text)"></p>
+    <p style="margin-top:14px">Next: verify your identity, e-sign the agreement, and confirm your deposit. A confirmation will be emailed to you automatically.</p>
+    <button class="btn btn-gold btn-block" id="modal-close" style="margin-top:20px">Got it</button>
+  </div>
+</div>
+
+<div class="demo-tag">✦ Interactive Demo</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
