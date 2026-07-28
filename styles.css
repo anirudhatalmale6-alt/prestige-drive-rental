@@ -123,6 +123,32 @@ section{padding:80px 0}
 .price .amt{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--text)}
 .price .per{color:var(--muted);font-size:13px}
 
+/* ---------- Promo showcase ---------- */
+.showcase{background:linear-gradient(180deg,var(--bg-2),var(--bg));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.showcase-scroll{
+  display:flex;gap:24px;overflow-x:auto;padding:8px 4px 20px;scroll-snap-type:x mandatory;
+  scrollbar-width:thin;scrollbar-color:var(--gold) transparent;
+}
+.showcase-scroll::-webkit-scrollbar{height:8px}
+.showcase-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.showcase-scroll::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+.poster{
+  flex:none;scroll-snap-align:center;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:var(--shadow);height:520px;background:#0c0d0f;transition:transform .25s ease,border-color .25s ease;
+}
+.poster:hover{transform:translateY(-4px);border-color:rgba(201,162,75,.5)}
+.poster img{height:100%;width:auto;display:block}
+.showcase-hint{text-align:center;color:var(--muted);font-size:13px;margin-top:6px}
+.showcase-hint span{color:var(--gold)}
+@media(max-width:600px){ .poster{height:420px} }
+
+/* ---------- Tagline ribbon ---------- */
+.tagline{
+  display:inline-flex;align-items:center;gap:14px;margin:24px 0 4px;
+  font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.5px;color:var(--gold-2)
+}
+.tagline::before,.tagline::after{content:"";width:30px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
 /* ---------- Feature strip ---------- */
 .features{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
