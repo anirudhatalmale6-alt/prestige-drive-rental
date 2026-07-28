@@ -116,7 +116,7 @@ function initHome(){
 function getParam(k){ return new URLSearchParams(location.search).get(k); }
 function initDetail(){
   const car = FLEET.find(c => c.id === getParam('id')) || FLEET[0];
-  document.title = `${car.make} ${car.model} — Prestige Drive`;
+  document.title = `${car.make} ${car.model} — Prime Deals Rentals`;
   const el = id => document.getElementById(id);
   el('main-photo').innerHTML = carSVG(car,{suffix:'m'});
   el('thumbs').innerHTML = [1,2,3,4].map(i=>`<div class="thumb">${carSVG(car,{suffix:'t'+i})}</div>`).join('');
@@ -166,7 +166,7 @@ function initDetail(){
       notice.className='notice err'; notice.textContent='Please choose valid available dates first.';
       return;
     }
-    const ref = 'PD-' + car.id.split('-')[0].toUpperCase().slice(0,3) + '-' + String(1000 + (car.model.length*37 + daysBetween(start.value,end.value)*13)).slice(0,4);
+    const ref = 'PDR-' + car.id.split('-')[0].toUpperCase().slice(0,3) + '-' + String(1000 + (car.model.length*37 + daysBetween(start.value,end.value)*13)).slice(0,4);
     document.getElementById('m-ref').textContent = ref;
     document.getElementById('m-dates').textContent = `${start.value} → ${end.value}`;
     document.getElementById('modal').classList.add('show');
