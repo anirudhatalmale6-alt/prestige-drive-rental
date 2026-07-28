@@ -77,6 +77,7 @@ window.FLEET = [
     id: "mercedes-gt53-amg-2020",
     make: "Mercedes-AMG", model: "GT 53", year: 2020,
     className: "4-Door Performance Coupe",
+    photo: "assets/cars/gt53.jpg",
     price: 545,
     seats: 4, doors: 4, transmission: "Automatic", fuel: "Petrol", drive: "AWD",
     features: ["AMG 3.0L turbo", "Burmester surround sound", "AMG Ride Control", "Ambient lighting", "Head-up display", "Performance exhaust"],
