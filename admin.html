@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Prime Deals Rental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin">
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login">
+  <div class="login-card">
+    <img src="assets/logo.png" alt="Prime Deals Rental">
+    <h1>Admin Dashboard</h1>
+    <p>Sign in to manage your fleet, bookings and availability.</p>
+    <div class="afield">
+      <label for="pw">Password</label>
+      <input type="password" id="pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="notice err" id="login-err" style="display:none;margin-top:12px"></div>
+    <button class="abtn gold btn-block" style="width:100%;justify-content:center;margin-top:18px" onclick="doLogin()">Sign In</button>
+    <div class="login-hint">Demo password: <code>prime2026</code></div>
+  </div>
+</div>
+
+<!-- DASHBOARD SHELL -->
+<div class="admin-shell" id="shell" style="display:none">
+  <aside class="sidebar">
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="Prime Deals Rental"></a>
+    <button class="nav-item active" data-view="dashboard"><span class="ic">▤</span> Dashboard</button>
+    <button class="nav-item" data-view="vehicles"><span class="ic">🚗</span> Vehicles</button>
+    <button class="nav-item" data-view="bookings"><span class="ic">📅</span> Bookings</button>
+    <button class="nav-item" data-view="block"><span class="ic">🔒</span> Block Dates</button>
+    <button class="nav-item" data-view="promos"><span class="ic">🏷️</span> Promo Codes</button>
+    <div class="spacer"></div>
+    <div class="foot">
+      <a href="index.html" target="_blank">↗ View public site</a>
+      <a href="#" onclick="resetDemo();return false;">↺ Reset demo data</a>
+      <a href="#" onclick="doLogout();return false;">⎋ Sign out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="demo-note"><b>Interactive preview:</b> changes save in this browser so you can try everything end-to-end. The live version stores data on a secure server so it's shared across all devices and staff.</div>
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-head"><div><h1>Dashboard</h1><p>Overview of your rental business.</p></div></div>
+      <div class="stats" id="stat-cards"></div>
+      <div class="panel">
+        <h3>Recent bookings</h3>
+        <div id="recent-bookings"></div>
+      </div>
+    </section>
+
+    <!-- VEHICLES -->
+    <section class="view" id="view-vehicles">
+      <div class="page-head">
+        <div><h1>Vehicles</h1><p>Add, edit, price and manage your fleet.</p></div>
+        <button class="abtn gold" onclick="openVehicle()">+ Add Vehicle</button>
+      </div>
+      <div class="panel"><table class="tbl"><thead><tr><th>Vehicle</th><th>Class</th><th>Price / day</th><th>Status</th><th></th></tr></thead><tbody id="veh-rows"></tbody></table></div>
+    </section>
+
+    <!-- BOOKINGS -->
+    <section class="view" id="view-bookings">
+      <div class="page-head"><div><h1>Bookings</h1><p>Reservations made through your website.</p></div></div>
+      <div class="panel"><table class="tbl"><thead><tr><th>Ref</th><th>Customer</th><th>Vehicle</th><th>Dates</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="book-rows"></tbody></table></div>
+    </section>
+
+    <!-- BLOCK DATES -->
+    <section class="view" id="view-block">
+      <div class="page-head"><div><h1>Block Dates</h1><p>Reserve dates for private rentals, maintenance or personal use — blocked dates can't be booked online.</p></div></div>
+      <div class="panel">
+        <div class="cal-controls">
+          <div class="afield"><label>Vehicle</label><select id="block-vehicle" onchange="renderBlock()"></select></div>
+          <div class="afield"><label>From</label><input type="date" id="block-start"></div>
+          <div class="afield"><label>To</label><input type="date" id="block-end"></div>
+          <div class="afield" style="flex:1;min-width:180px"><label>Reason (optional)</label><input type="text" id="block-reason" placeholder="e.g. Private rental, Maintenance"></div>
+          <button class="abtn gold" onclick="addBlock()">Block these dates</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot free"></i> Available</span>
+          <span><i class="dot blocked"></i> Blocked by you</span>
+          <span><i class="dot booked"></i> Booked by customer</span>
+        </div>
+        <div class="cals" id="block-cals"></div>
+        <div class="blocks-list" id="blocks-list"></div>
+      </div>
+    </section>
+
+    <!-- PROMOS -->
+    <section class="view" id="view-promos">
+      <div class="page-head">
+        <div><h1>Promo Codes</h1><p>Create discount codes for promotions.</p></div>
+        <button class="abtn gold" onclick="openPromo()">+ Add Code</button>
+      </div>
+      <div class="panel"><table class="tbl"><thead><tr><th>Code</th><th>Discount</th><th>Status</th><th></th></tr></thead><tbody id="promo-rows"></tbody></table></div>
+    </section>
+  </main>
+</div>
+
+<!-- VEHICLE MODAL -->
+<div class="amodal" id="veh-modal">
+  <div class="amodal-box">
+    <h3 id="veh-modal-title">Add Vehicle</h3>
+    <input type="hidden" id="v-id">
+    <div class="form-grid">
+      <div class="afield"><label>Make</label><input type="text" id="v-make" placeholder="Bentley"></div>
+      <div class="afield"><label>Model</label><input type="text" id="v-model" placeholder="Bentayga"></div>
+      <div class="afield"><label>Year</label><input type="number" id="v-year" placeholder="2022"></div>
+      <div class="afield"><label>Class</label><input type="text" id="v-class" placeholder="Ultra Luxury SUV"></div>
+      <div class="afield"><label>Price / day (USD)</label><input type="number" id="v-price" placeholder="895"></div>
+      <div class="afield"><label>Seats</label><input type="number" id="v-seats" placeholder="5"></div>
+      <div class="afield"><label>Doors</label><input type="number" id="v-doors" placeholder="4"></div>
+      <div class="afield"><label>Transmission</label><input type="text" id="v-trans" placeholder="Automatic"></div>
+      <div class="afield"><label>Drivetrain</label><input type="text" id="v-drive" placeholder="AWD"></div>
+      <div class="afield"><label>Fuel</label><input type="text" id="v-fuel" placeholder="Petrol"></div>
+      <div class="afield full"><label>Features (comma separated)</label><input type="text" id="v-features" placeholder="Panoramic roof, Heated seats, Premium audio"></div>
+      <div class="afield full"><label>Description</label><textarea id="v-desc" placeholder="Short description shown on the vehicle page"></textarea></div>
+      <div class="afield full">
+        <label>Photo</label>
+        <input type="file" id="v-photo-file" accept="image/*" onchange="onPhotoFile(event)">
+        <input type="text" id="v-photo" placeholder="…or paste an image URL / path" style="margin-top:8px" oninput="previewPhoto(this.value)">
+        <div class="photo-prev"><img id="v-photo-prev" src="" alt=""></div>
+      </div>
+      <div class="afield full">
+        <label><input type="checkbox" id="v-available" checked style="width:auto;margin-right:8px">Available for online booking</label>
+      </div>
+    </div>
+    <div class="amodal-foot">
+      <button class="abtn" onclick="closeModal('veh-modal')">Cancel</button>
+      <button class="abtn gold" onclick="saveVehicle()">Save Vehicle</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROMO MODAL -->
+<div class="amodal" id="promo-modal">
+  <div class="amodal-box" style="max-width:440px">
+    <h3>Add Promo Code</h3>
+    <div class="form-grid">
+      <div class="afield full"><label>Code</label><input type="text" id="p-code" placeholder="SUMMER20" style="text-transform:uppercase"></div>
+      <div class="afield"><label>Type</label><select id="p-type"><option value="percent">% off</option><option value="fixed">$ off</option></select></div>
+      <div class="afield"><label>Value</label><input type="number" id="p-value" placeholder="20"></div>
+    </div>
+    <div class="amodal-foot">
+      <button class="abtn" onclick="closeModal('promo-modal')">Cancel</button>
+      <button class="abtn gold" onclick="savePromo()">Save Code</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

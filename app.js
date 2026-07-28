@@ -73,9 +73,10 @@ function initMenu(){
 function renderFleet(filter){
   const grid = document.getElementById('fleet-grid');
   if(!grid) return;
+  const fleet = (window.Store ? Store.getFleet() : FLEET);
   const cars = (filter && filter!=='all')
-    ? FLEET.filter(c => catOf(c) === filter)
-    : FLEET;
+    ? fleet.filter(c => catOf(c) === filter)
+    : fleet;
   grid.innerHTML = cars.map(cardHTML).join('');
 }
 function catOf(c){
@@ -90,11 +91,12 @@ function cardHTML(c){
       <span>⚙️ ${c.transmission}</span>
       <span>🚗 ${c.drive}</span>
     </div>`;
+  const isOff = c.available === false;
   return `
   <a class="card" href="vehicle.html?id=${c.id}">
     <div class="car-photo">
       ${carMedia(c)}
-      <div class="badge avail">Available</div>
+      <div class="badge ${isOff?'off':'avail'}">${isOff?'Unavailable':'Available'}</div>
     </div>
     <div class="card-body">
       <h3>${c.make} ${c.model}</h3>
@@ -121,7 +123,8 @@ function initHome(){
 /* ---------- Vehicle detail rendering ---------- */
 function getParam(k){ return new URLSearchParams(location.search).get(k); }
 function initDetail(){
-  const car = FLEET.find(c => c.id === getParam('id')) || FLEET[0];
+  const fleet = (window.Store ? Store.getFleet() : FLEET);
+  const car = fleet.find(c => c.id === getParam('id')) || fleet[0];
   document.title = `${car.make} ${car.model} — Prime Deals Rental`;
   const el = id => document.getElementById(id);
   el('main-photo').innerHTML = carMedia(car,{suffix:'m'});
@@ -145,7 +148,13 @@ function initDetail(){
   const start = el('pickup'), end = el('return'), out = el('summary'), notice = el('notice');
   const today = new Date().toISOString().split('T')[0];
   start.min = today; end.min = today;
+  let quote = null;
+  function unavailable(s,e){
+    if(window.Store) return Store.isUnavailable(car, s, e);
+    return isBookedBetween(car, s, e) ? {blocked:true, reason:'Already booked for part of those dates.'} : {blocked:false};
+  }
   function recompute(){
+    quote = null;
     notice.className='notice'; notice.textContent='';
     if(!start.value || !end.value){ out.classList.remove('show'); return; }
     if(new Date(end.value) <= new Date(start.value)){
@@ -153,15 +162,16 @@ function initDetail(){
       notice.className='notice err'; notice.textContent='Return date must be after pickup date.';
       return;
     }
-    if(isBookedBetween(car, start.value, end.value)){
+    const u = unavailable(start.value, end.value);
+    if(u.blocked){
       out.classList.remove('show');
-      notice.className='notice err';
-      notice.textContent='Sorry — this vehicle is already booked for part of those dates. Please try different dates.';
+      notice.className='notice err'; notice.textContent = u.reason;
       return;
     }
     const days = daysBetween(start.value, end.value);
     const subtotal = days * car.price;
     const deposit = Math.round(subtotal * 0.25);
+    quote = { days, subtotal, deposit };
     el('s-days').textContent = `${money(car.price)} × ${days} day${days>1?'s':''}`;
     el('s-subtotal').textContent = money(subtotal);
     el('s-deposit').textContent = money(deposit);
@@ -173,11 +183,31 @@ function initDetail(){
   end.addEventListener('change', recompute);
 
   el('book-btn').addEventListener('click',()=>{
-    if(!start.value || !end.value || !out.classList.contains('show')){
+    if(!start.value || !end.value || !quote){
       notice.className='notice err'; notice.textContent='Please choose valid available dates first.';
       return;
     }
+    const nameEl = el('c-name'), emailEl = el('c-email'), phoneEl = el('c-phone');
+    const name = nameEl ? nameEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    if(nameEl && (!name || !email)){
+      notice.className='notice err'; notice.textContent='Please enter your name and email to reserve.';
+      return;
+    }
     const ref = 'PDR-' + car.id.split('-')[0].toUpperCase().slice(0,3) + '-' + String(1000 + (car.model.length*37 + daysBetween(start.value,end.value)*13)).slice(0,4);
+    if(window.Store){
+      Store.addBooking({
+        id: ref,
+        vehicleId: car.id,
+        vehicle: `${car.year} ${car.make} ${car.model}`,
+        customer: { name, email, phone },
+        start: start.value, end: end.value,
+        days: quote.days, total: quote.subtotal, deposit: quote.deposit,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      });
+    }
     document.getElementById('m-ref').textContent = ref;
     document.getElementById('m-dates').textContent = `${start.value} → ${end.value}`;
     document.getElementById('modal').classList.add('show');
