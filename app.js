@@ -41,6 +41,12 @@ function carSVG(car, opts){
     <text x="300" y="100" text-anchor="middle" fill="rgba(201,162,75,.9)" font-family="Inter, sans-serif" font-size="15" letter-spacing="3">${(car.model+" · "+car.year).toUpperCase()}</text>
   </svg>`;
 }
+/* Returns a real photo when the car has one, otherwise the SVG placeholder. */
+function carMedia(car, opts){
+  opts = opts || {};
+  if(car.photo) return `<img class="car-img" src="${car.photo}" alt="${car.make} ${car.model}" loading="lazy">`;
+  return carSVG(car, opts);
+}
 function hexToRgb(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
 function clamp(v){return Math.max(0,Math.min(255,v));}
 function lighten(h,amt){const[r,g,b]=hexToRgb(h);return `rgb(${clamp(r+amt)},${clamp(g+amt)},${clamp(b+amt)})`;}
@@ -87,7 +93,7 @@ function cardHTML(c){
   return `
   <a class="card" href="vehicle.html?id=${c.id}">
     <div class="car-photo">
-      ${carSVG(c)}
+      ${carMedia(c)}
       <div class="badge avail">Available</div>
     </div>
     <div class="card-body">
@@ -118,8 +124,13 @@ function initDetail(){
   const car = FLEET.find(c => c.id === getParam('id')) || FLEET[0];
   document.title = `${car.make} ${car.model} — Prime Deals Rental`;
   const el = id => document.getElementById(id);
-  el('main-photo').innerHTML = carSVG(car,{suffix:'m'});
-  el('thumbs').innerHTML = [1,2,3,4].map(i=>`<div class="thumb">${carSVG(car,{suffix:'t'+i})}</div>`).join('');
+  el('main-photo').innerHTML = carMedia(car,{suffix:'m'});
+  if(car.photo){
+    el('thumbs').innerHTML = `<div class="thumb">${carMedia(car,{suffix:'t'})}</div>`;
+    el('thumbs').style.gridTemplateColumns = 'repeat(4,1fr)';
+  } else {
+    el('thumbs').innerHTML = [1,2,3,4].map(i=>`<div class="thumb">${carSVG(car,{suffix:'t'+i})}</div>`).join('');
+  }
   el('v-class').textContent = car.className;
   el('v-title').textContent = `${car.make} ${car.model}`;
   el('v-lead').textContent = car.desc;
