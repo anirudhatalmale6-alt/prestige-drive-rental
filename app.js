@@ -116,7 +116,7 @@ function initHome(){
 function getParam(k){ return new URLSearchParams(location.search).get(k); }
 function initDetail(){
   const car = FLEET.find(c => c.id === getParam('id')) || FLEET[0];
-  document.title = `${car.make} ${car.model} — Prime Deals Rentals`;
+  document.title = `${car.make} ${car.model} — Prime Deals Rental`;
   const el = id => document.getElementById(id);
   el('main-photo').innerHTML = carSVG(car,{suffix:'m'});
   el('thumbs').innerHTML = [1,2,3,4].map(i=>`<div class="thumb">${carSVG(car,{suffix:'t'+i})}</div>`).join('');
