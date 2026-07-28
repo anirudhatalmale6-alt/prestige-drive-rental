@@ -2,6 +2,18 @@
    Photos are elegant placeholders for now; the client's real photos drop straight in. */
 window.FLEET = [
   {
+    id: "rolls-royce-wraith-2016",
+    make: "Rolls-Royce", model: "Wraith", year: 2016,
+    className: "Ultra Luxury Grand Coupe",
+    photo: "assets/cars/rolls.jpg",
+    price: 1250,
+    seats: 4, doors: 2, transmission: "Automatic", fuel: "Petrol", drive: "RWD",
+    features: ["6.6L twin-turbo V12", "Starlight headliner", "Spirit of Ecstasy", "Coach (suicide) doors", "Bespoke leather interior", "Bespoke premium audio"],
+    desc: "The crown jewel of the fleet. A hand-built Rolls-Royce grand tourer with a 624-hp V12 and the iconic Starlight headliner — pure presence for weddings, milestones, and once-in-a-lifetime occasions.",
+    accent: "#3a3f45",
+    booked: []
+  },
+  {
     id: "bentley-bentayga-2017",
     make: "Bentley", model: "Bentayga", year: 2017,
     className: "Ultra Luxury SUV",
