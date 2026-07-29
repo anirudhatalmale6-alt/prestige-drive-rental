@@ -19,6 +19,19 @@
     try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { console.warn('storage full', e); }
   }
 
+  /* ---- One-time migrations ---- */
+  // Clear legacy demo "booked" seed ranges from existing browsers (real bookings
+  // live in the bookings store, so vehicle.booked only ever held demo placeholders).
+  function migrate() {
+    if (localStorage.getItem('pdr_seed_cleared_v1')) return;
+    const raw = localStorage.getItem(KEYS.fleet);
+    if (raw) {
+      try { const f = JSON.parse(raw); f.forEach(v => { v.booked = []; }); write(KEYS.fleet, f); } catch (e) {}
+    }
+    localStorage.setItem('pdr_seed_cleared_v1', '1');
+  }
+  migrate();
+
   /* ---- Fleet ---- */
   function defaultFleet() {
     return (window.FLEET || []).map(c => Object.assign({ available: true, blocks: [], booked: c.booked || [] }, c));
@@ -52,6 +65,16 @@
   /* ---- Promo codes ---- */
   function getPromos() { return read(KEYS.promos, []); }
   function savePromos(p) { write(KEYS.promos, p); }
+  function findActivePromo(code) {
+    if (!code) return null;
+    const c = String(code).trim().toUpperCase();
+    return getPromos().find(p => p.active && p.code.toUpperCase() === c) || null;
+  }
+  function applyPromo(promo, subtotal) {
+    if (!promo) return 0;
+    const d = promo.type === 'percent' ? Math.round(subtotal * promo.value / 100) : Number(promo.value);
+    return Math.max(0, Math.min(subtotal, d));
+  }
 
   /* ---- Availability ---- */
   function overlaps(aS, aE, bS, bE) { return aS <= bE && bS <= aE; }
@@ -88,7 +111,7 @@
     KEYS, read, write,
     getFleet, saveFleet, resetFleet, getVehicle, upsertVehicle, deleteVehicle, defaultFleet,
     getBookings, saveBookings, addBooking, updateBooking,
-    getPromos, savePromos,
+    getPromos, savePromos, findActivePromo, applyPromo,
     overlaps, rangesFor, isUnavailable,
     login, isAuthed, logout, DEMO_PASSWORD
   };

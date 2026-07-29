@@ -23,7 +23,7 @@ window.FLEET = [
     features: ["Nappa leather interior", "Panoramic roof", "Naim premium audio", "Heated & cooled seats", "Adaptive cruise", "22\" alloy wheels"],
     desc: "The Bentayga blends hand-crafted British luxury with genuine SUV capability. A statement car for weddings, executive travel, or an unforgettable weekend.",
     accent: "#1b3d2f",
-    booked: [["2026-08-02","2026-08-05"]]
+    booked: []
   },
   {
     id: "bmw-x6-2021",
@@ -59,7 +59,7 @@ window.FLEET = [
     features: ["7-seat leather cabin", "38\" curved OLED display", "AKG 36-speaker audio", "Super Cruise", "Rear entertainment", "Power running boards"],
     desc: "The definition of American luxury. Seven seats of leather and tech — the go-to for group travel, airport runs, and events.",
     accent: "#20222a",
-    booked: [["2026-07-30","2026-08-01"]]
+    booked: []
   },
   {
     id: "gmc-terrain-2026",
@@ -119,6 +119,6 @@ window.FLEET = [
     features: ["Executive rear seats", "Burmester 4D audio", "Rear-seat screens", "Massage seats", "MBUX Hyperscreen", "Air suspension"],
     desc: "The pinnacle of the S-Class line. First-class rear seating and cutting-edge tech — the ultimate for VIP transport and special occasions.",
     accent: "#191b1f",
-    booked: [["2026-08-10","2026-08-14"]]
+    booked: []
   }
 ];

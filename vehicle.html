@@ -91,10 +91,20 @@
             </div>
           </div>
 
+          <div class="field">
+            <label for="c-promo">Promo code (optional)</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="c-promo" placeholder="e.g. CHRISTMAS26" style="text-transform:uppercase">
+              <button type="button" class="btn btn-ghost" id="promo-apply" style="padding:10px 16px;white-space:nowrap">Apply</button>
+            </div>
+            <div class="notice" id="promo-msg" style="display:none;margin-top:8px"></div>
+          </div>
+
           <div class="notice" id="notice"></div>
 
           <div class="summary" id="summary">
             <div class="line"><span id="s-days"></span><span id="s-subtotal"></span></div>
+            <div class="line" id="s-discount-row" style="display:none"><span id="s-discount-label"></span><span id="s-discount"></span></div>
             <div class="line"><span>Due now (25% deposit)</span><span id="s-deposit"></span></div>
             <div class="line total"><span>Rental total</span><span id="s-total"></span></div>
           </div>

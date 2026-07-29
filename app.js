@@ -148,7 +148,7 @@ function initDetail(){
   const start = el('pickup'), end = el('return'), out = el('summary'), notice = el('notice');
   const today = new Date().toISOString().split('T')[0];
   start.min = today; end.min = today;
-  let quote = null;
+  let quote = null, appliedPromo = null;
   function unavailable(s,e){
     if(window.Store) return Store.isUnavailable(car, s, e);
     return isBookedBetween(car, s, e) ? {blocked:true, reason:'Already booked for part of those dates.'} : {blocked:false};
@@ -170,17 +170,46 @@ function initDetail(){
     }
     const days = daysBetween(start.value, end.value);
     const subtotal = days * car.price;
-    const deposit = Math.round(subtotal * 0.25);
-    quote = { days, subtotal, deposit };
+    const discount = (window.Store && appliedPromo) ? Store.applyPromo(appliedPromo, subtotal) : 0;
+    const total = subtotal - discount;
+    const deposit = Math.round(total * 0.25);
+    quote = { days, subtotal, discount, total, deposit, promo: appliedPromo ? appliedPromo.code : null };
     el('s-days').textContent = `${money(car.price)} × ${days} day${days>1?'s':''}`;
     el('s-subtotal').textContent = money(subtotal);
+    const dRow = el('s-discount-row');
+    if(discount > 0){
+      dRow.style.display = 'flex';
+      el('s-discount-label').textContent = `Promo (${appliedPromo.code})`;
+      el('s-discount').textContent = '– ' + money(discount);
+    } else { dRow.style.display = 'none'; }
     el('s-deposit').textContent = money(deposit);
-    el('s-total').textContent = money(subtotal);
+    el('s-total').textContent = money(total);
     out.classList.add('show');
     notice.className='notice ok'; notice.textContent='Available for your dates ✓';
   }
   start.addEventListener('change',()=>{ if(start.value) end.min = start.value; recompute(); });
   end.addEventListener('change', recompute);
+
+  // promo code
+  const promoBtn = el('promo-apply'), promoInput = el('c-promo'), promoMsg = el('promo-msg');
+  if(promoBtn){
+    promoBtn.addEventListener('click',()=>{
+      const code = (promoInput.value||'').trim();
+      promoMsg.style.display='block';
+      if(!code){ appliedPromo=null; promoMsg.className='notice err'; promoMsg.textContent='Enter a promo code.'; recompute(); return; }
+      const p = window.Store ? Store.findActivePromo(code) : null;
+      if(p){
+        appliedPromo = p;
+        promoMsg.className='notice ok';
+        promoMsg.textContent = `Code applied — ${p.type==='percent'? p.value+'% off' : money(p.value)+' off'}!`;
+      } else {
+        appliedPromo = null;
+        promoMsg.className='notice err';
+        promoMsg.textContent = 'That code isn\'t valid or is no longer active.';
+      }
+      recompute();
+    });
+  }
 
   el('book-btn').addEventListener('click',()=>{
     if(!start.value || !end.value || !quote){
@@ -203,7 +232,8 @@ function initDetail(){
         vehicle: `${car.year} ${car.make} ${car.model}`,
         customer: { name, email, phone },
         start: start.value, end: end.value,
-        days: quote.days, total: quote.subtotal, deposit: quote.deposit,
+        days: quote.days, subtotal: quote.subtotal, discount: quote.discount,
+        promo: quote.promo, total: quote.total, deposit: quote.deposit,
         status: 'pending',
         createdAt: new Date().toISOString()
       });
