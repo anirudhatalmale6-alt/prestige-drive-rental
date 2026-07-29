@@ -171,9 +171,12 @@ function initDetail(){
     const days = daysBetween(start.value, end.value);
     const subtotal = days * car.price;
     const discount = (window.Store && appliedPromo) ? Store.applyPromo(appliedPromo, subtotal) : 0;
-    const total = subtotal - discount;
+    const loc = el('location') ? el('location').value : '';
+    const isDelivery = /delivery/i.test(loc);
+    const delivery = (isDelivery && window.Store) ? Store.deliveryFee(days) : 0;
+    const total = subtotal - discount + delivery;
     const deposit = Math.round(total * 0.25);
-    quote = { days, subtotal, discount, total, deposit, promo: appliedPromo ? appliedPromo.code : null };
+    quote = { days, subtotal, discount, delivery, isDelivery, total, deposit, promo: appliedPromo ? appliedPromo.code : null };
     el('s-days').textContent = `${money(car.price)} × ${days} day${days>1?'s':''}`;
     el('s-subtotal').textContent = money(subtotal);
     const dRow = el('s-discount-row');
@@ -182,10 +185,33 @@ function initDetail(){
       el('s-discount-label').textContent = `Promo (${appliedPromo.code})`;
       el('s-discount').textContent = '– ' + money(discount);
     } else { dRow.style.display = 'none'; }
+    const delRow = el('s-delivery-row');
+    if(isDelivery){
+      delRow.style.display = 'flex';
+      el('s-delivery-label').textContent = delivery === 0 ? 'Delivery (3+ days)' : 'Delivery fee (under 3 days)';
+      el('s-delivery').textContent = delivery === 0 ? 'FREE' : money(delivery);
+    } else { delRow.style.display = 'none'; }
     el('s-deposit').textContent = money(deposit);
     el('s-total').textContent = money(total);
     out.classList.add('show');
     notice.className='notice ok'; notice.textContent='Available for your dates ✓';
+  }
+  // delivery address toggle
+  const locSel = el('location'), delBlock = el('delivery-block');
+  if(locSel){
+    locSel.addEventListener('change',()=>{
+      if(delBlock) delBlock.style.display = /delivery/i.test(locSel.value) ? 'block' : 'none';
+      recompute();
+    });
+  }
+  // prefill from logged-in customer
+  if(window.Store){
+    const cust = Store.currentCustomer();
+    if(cust){
+      if(el('c-name')) el('c-name').value = cust.name || '';
+      if(el('c-email')) el('c-email').value = cust.email || '';
+      if(el('c-phone')) el('c-phone').value = cust.phone || '';
+    }
   }
   start.addEventListener('change',()=>{ if(start.value) end.min = start.value; recompute(); });
   end.addEventListener('change', recompute);
@@ -226,11 +252,15 @@ function initDetail(){
     }
     const ref = 'PDR-' + car.id.split('-')[0].toUpperCase().slice(0,3) + '-' + String(1000 + (car.model.length*37 + daysBetween(start.value,end.value)*13)).slice(0,4);
     if(window.Store){
+      const locEl = el('location'), addrEl = el('c-address');
       Store.addBooking({
         id: ref,
         vehicleId: car.id,
         vehicle: `${car.year} ${car.make} ${car.model}`,
         customer: { name, email, phone },
+        location: locEl ? locEl.value : '',
+        deliveryAddress: (quote.isDelivery && addrEl) ? addrEl.value.trim() : '',
+        delivery: quote.delivery,
         start: start.value, end: end.value,
         days: quote.days, subtotal: quote.subtotal, discount: quote.discount,
         promo: quote.promo, total: quote.total, deposit: quote.deposit,

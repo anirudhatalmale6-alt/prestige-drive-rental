@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Prime Deals Rental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="account.css">
+</head>
+<body class="admin">
+
+<header>
+  <div class="container nav">
+    <a class="brand" href="index.html"><img class="brand-logo" src="assets/logo.png" alt="Prime Deals Rental"></a>
+    <nav class="nav-links">
+      <a href="index.html#fleet">Our Fleet</a>
+      <a href="index.html#how">How It Works</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="index.html#fleet" class="btn btn-gold">Book Now</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<!-- AUTH -->
+<div class="login-wrap" id="auth">
+  <div class="login-card">
+    <img src="assets/logo.png" alt="Prime Deals Rental">
+
+    <!-- LOGIN -->
+    <div id="login-form">
+      <h1>Welcome back</h1>
+      <p>Sign in to your account to book and manage rentals.</p>
+      <div class="afield"><label>Email</label><input type="email" id="l-email" placeholder="you@email.com"></div>
+      <div class="afield" style="margin-top:12px"><label>Password</label><input type="password" id="l-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')doCustomerLogin()"></div>
+      <div class="notice err" id="login-err" style="display:none;margin-top:12px"></div>
+      <button class="abtn gold" style="width:100%;justify-content:center;margin-top:18px" onclick="doCustomerLogin()">Sign In</button>
+      <p class="swap">New here? <a href="#" onclick="showForm('register');return false;">Create an account</a></p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register-form" style="display:none">
+      <h1>Create account</h1>
+      <p>Join Prime Deals Rental — book faster and track your rentals.</p>
+      <div class="afield"><label>Full name</label><input type="text" id="r-name" placeholder="Your name"></div>
+      <div class="afield" style="margin-top:12px"><label>Email</label><input type="email" id="r-email" placeholder="you@email.com"></div>
+      <div class="afield" style="margin-top:12px"><label>Phone</label><input type="tel" id="r-phone" placeholder="(555) 000-0000"></div>
+      <div class="afield" style="margin-top:12px"><label>Password</label><input type="password" id="r-pass" placeholder="Create a password"></div>
+      <div class="notice err" id="reg-err" style="display:none;margin-top:12px"></div>
+      <button class="abtn gold" style="width:100%;justify-content:center;margin-top:18px" onclick="doRegister()">Create Account</button>
+      <p class="swap">Already have an account? <a href="#" onclick="showForm('login');return false;">Sign in</a></p>
+    </div>
+
+    <!-- 2FA -->
+    <div id="twofa-form" style="display:none">
+      <h1>Verify it's you</h1>
+      <p>For your security, we sent a 6-digit code to your email.</p>
+      <div class="demo-2fa" id="twofa-demo"></div>
+      <div class="afield" style="margin-top:14px"><label>6-digit code</label><input type="text" id="tf-code" maxlength="6" placeholder="••••••" onkeydown="if(event.key==='Enter')verify2FA()"></div>
+      <div class="notice err" id="tf-err" style="display:none;margin-top:12px"></div>
+      <button class="abtn gold" style="width:100%;justify-content:center;margin-top:18px" onclick="verify2FA()">Verify &amp; Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT DASHBOARD -->
+<div class="account-wrap" id="account" style="display:none">
+  <div class="container acc-inner">
+    <div class="page-head">
+      <div><h1>My Account</h1><p id="acc-greeting"></p></div>
+      <button class="abtn" onclick="doCustomerLogout()">⎋ Sign out</button>
+    </div>
+
+    <div class="acc-grid">
+      <div>
+        <!-- Profile -->
+        <div class="panel">
+          <h3>Profile</h3>
+          <div class="form-grid">
+            <div class="afield"><label>Full name</label><input type="text" id="p-name"></div>
+            <div class="afield"><label>Phone</label><input type="tel" id="p-phone"></div>
+            <div class="afield full"><label>Email</label><input type="email" id="p-email" disabled></div>
+          </div>
+          <div style="margin-top:16px"><button class="abtn gold" onclick="saveProfile()">Save changes</button></div>
+        </div>
+
+        <!-- Identity verification -->
+        <div class="panel">
+          <h3>Identity verification</h3>
+          <div class="verify-status" id="verify-status"></div>
+          <p style="color:var(--muted);font-size:13px;margin-top:12px">Before your first pickup you'll upload your driver's license and complete a quick selfie match. Your documents are stored privately and securely.</p>
+          <button class="abtn" id="verify-btn" style="margin-top:14px" onclick="startVerify()">Start verification</button>
+        </div>
+      </div>
+
+      <!-- Bookings -->
+      <div class="panel">
+        <h3>My bookings</h3>
+        <div id="acc-bookings"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFY MODAL -->
+<div class="amodal" id="verify-modal">
+  <div class="amodal-box" style="max-width:480px">
+    <h3>Verify your identity</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px">Upload a clear photo of your driver's license and a selfie. On the live site these are checked automatically (selfie matched to the license) and stored securely — never public.</p>
+    <div class="afield" style="margin-bottom:14px">
+      <label>1. Driver's license photo</label>
+      <input type="file" id="vf-license" accept="image/*">
+    </div>
+    <div class="afield">
+      <label>2. Selfie</label>
+      <input type="file" id="vf-selfie" accept="image/*">
+    </div>
+    <div class="notice" id="vf-msg" style="display:none;margin-top:12px"></div>
+    <div class="amodal-foot">
+      <button class="abtn" onclick="closeModal('verify-modal')">Cancel</button>
+      <button class="abtn gold" onclick="submitVerify()">Submit for verification</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="account.js"></script>
+</body>
+</html>

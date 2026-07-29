@@ -19,6 +19,7 @@
       <a href="index.html#how">How It Works</a>
       <a href="index.html#verify">Verification</a>
       <a href="index.html#contact">Contact</a>
+      <a href="account.html">Account</a>
       <a href="index.html#fleet" class="btn btn-gold">Book Now</a>
     </nav>
     <button class="menu-toggle" aria-label="Menu">☰</button>
@@ -76,6 +77,15 @@
             </select>
           </div>
 
+          <div class="field" id="delivery-block" style="display:none">
+            <label for="c-address">Delivery address</label>
+            <input type="text" id="c-address" placeholder="Street address (within 10 miles of our office)">
+            <div class="verify-note" id="delivery-note" style="margin-top:8px">
+              <span class="ic">🚚</span>
+              <span>We deliver within a 10-mile radius of our Chicago office. Free delivery on rentals of 3 days or more — a $120 delivery fee applies to rentals under 3 days.</span>
+            </div>
+          </div>
+
           <div class="field">
             <label for="c-name">Full name</label>
             <input type="text" id="c-name" placeholder="Your name">
@@ -105,6 +115,7 @@
           <div class="summary" id="summary">
             <div class="line"><span id="s-days"></span><span id="s-subtotal"></span></div>
             <div class="line" id="s-discount-row" style="display:none"><span id="s-discount-label"></span><span id="s-discount"></span></div>
+            <div class="line" id="s-delivery-row" style="display:none"><span id="s-delivery-label">Delivery</span><span id="s-delivery"></span></div>
             <div class="line"><span>Due now (25% deposit)</span><span id="s-deposit"></span></div>
             <div class="line total"><span>Rental total</span><span id="s-total"></span></div>
           </div>

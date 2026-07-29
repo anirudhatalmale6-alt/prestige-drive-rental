@@ -8,8 +8,14 @@
     fleet: 'pdr_fleet_v1',
     bookings: 'pdr_bookings_v1',
     promos: 'pdr_promos_v1',
-    auth: 'pdr_auth_v1'
+    auth: 'pdr_auth_v1',
+    customers: 'pdr_customers_v1',
+    session: 'pdr_customer_session_v1'
   };
+
+  /* Delivery pricing (business rule) */
+  const DELIVERY = { radiusMiles: 10, feeUnderMin: 120, freeMinDays: 3 };
+  function deliveryFee(days) { return days >= DELIVERY.freeMinDays ? 0 : DELIVERY.feeUnderMin; }
 
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -101,6 +107,53 @@
     };
   }
 
+  /* ---- Customer accounts (demo) ---- */
+  function getCustomers() { return read(KEYS.customers, []); }
+  function saveCustomers(c) { write(KEYS.customers, c); }
+  function findCustomer(email) {
+    if (!email) return null;
+    const e = email.trim().toLowerCase();
+    return getCustomers().find(c => c.email.toLowerCase() === e) || null;
+  }
+  function registerCustomer(data) {
+    if (findCustomer(data.email)) return { error: 'An account with that email already exists.' };
+    const c = {
+      id: 'cust-' + (getCustomers().length + 1) + '-' + data.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, ''),
+      name: data.name.trim(), email: data.email.trim(), phone: (data.phone || '').trim(),
+      password: data.password, verified: false, createdAt: new Date().toISOString()
+    };
+    const list = getCustomers(); list.push(c); saveCustomers(list);
+    return { customer: c };
+  }
+  function authCustomer(email, password) {
+    const c = findCustomer(email);
+    if (!c || c.password !== password) return null;
+    return c;
+  }
+  function startSession(email) { sessionStorage.setItem(KEYS.session, email.trim().toLowerCase()); }
+  function endSession() { sessionStorage.removeItem(KEYS.session); }
+  function currentCustomer() {
+    const e = sessionStorage.getItem(KEYS.session);
+    return e ? findCustomer(e) : null;
+  }
+  function updateCustomer(email, patch) {
+    const list = getCustomers();
+    const i = list.findIndex(c => c.email.toLowerCase() === email.trim().toLowerCase());
+    if (i >= 0) { list[i] = Object.assign({}, list[i], patch); saveCustomers(list); return list[i]; }
+    return null;
+  }
+  function customerBookings(email) {
+    if (!email) return [];
+    const e = email.trim().toLowerCase();
+    return getBookings().filter(b => (b.customer && b.customer.email || '').toLowerCase() === e);
+  }
+  // Demo 2FA: deterministic 6-digit code from email (no Math.random); real version emails/SMS a code.
+  function twoFactorCode(email) {
+    let h = 0; const s = (email || '') + 'pdr2fa';
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1000000;
+    return String(100000 + (h % 900000));
+  }
+
   /* ---- Auth (demo only) ---- */
   const DEMO_PASSWORD = 'prime2026';
   function login(pw) { if (pw === DEMO_PASSWORD) { sessionStorage.setItem(KEYS.auth, '1'); return true; } return false; }
@@ -113,6 +166,9 @@
     getBookings, saveBookings, addBooking, updateBooking,
     getPromos, savePromos, findActivePromo, applyPromo,
     overlaps, rangesFor, isUnavailable,
-    login, isAuthed, logout, DEMO_PASSWORD
+    login, isAuthed, logout, DEMO_PASSWORD,
+    DELIVERY, deliveryFee,
+    getCustomers, findCustomer, registerCustomer, authCustomer,
+    startSession, endSession, currentCustomer, updateCustomer, customerBookings, twoFactorCode
   };
 })();

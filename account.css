@@ -1,0 +1,23 @@
+/* Account page styles (builds on styles.css + admin.css) */
+body.admin header{position:sticky;top:0;z-index:50}
+.login-wrap{min-height:calc(100vh - 74px)}
+.login-card h1{font-family:var(--serif);font-size:26px;margin-bottom:6px}
+.login-card p{color:var(--muted);font-size:14px;margin-bottom:22px}
+.swap{font-size:13px;color:var(--muted);margin-top:18px;margin-bottom:0}
+.swap a{color:var(--gold)}
+.demo-2fa{background:var(--bg-2);border:1px dashed var(--line);border-radius:10px;padding:12px;font-size:13px;color:var(--muted)}
+.demo-2fa b{color:var(--gold-2);font-family:monospace;letter-spacing:3px;font-size:18px}
+
+.account-wrap{padding:34px 0 60px;min-height:calc(100vh - 74px)}
+.acc-inner{max-width:1050px}
+.acc-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:22px;align-items:start}
+.verify-status{display:inline-flex;align-items:center;gap:10px;font-size:14px}
+.verify-status .pill{font-size:12px}
+
+.bk{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;background:var(--bg-2)}
+.bk .bk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.bk .bk-veh{font-weight:700}
+.bk .bk-meta{color:var(--muted);font-size:13px;line-height:1.7}
+.bk .bk-total{font-family:var(--serif);font-size:20px;font-weight:700;white-space:nowrap}
+
+@media(max-width:820px){ .acc-grid{grid-template-columns:1fr} }
