@@ -95,6 +95,14 @@
           <p style="color:var(--muted);font-size:13px;margin-top:12px">Before your first pickup you'll upload your driver's license and complete a quick selfie match. Your documents are stored privately and securely.</p>
           <button class="abtn" id="verify-btn" style="margin-top:14px" onclick="startVerify()">Start verification</button>
         </div>
+
+        <!-- Insurance card -->
+        <div class="panel">
+          <h3>Insurance card</h3>
+          <div class="verify-status" id="ins-status"></div>
+          <p style="color:var(--muted);font-size:13px;margin-top:12px">A current, valid auto insurance card is required on your profile before pickup. Upload a clear photo of the front of your card — we'll confirm it's valid and unexpired.</p>
+          <button class="abtn" id="ins-btn" style="margin-top:14px" onclick="startInsurance()">Upload insurance card</button>
+        </div>
       </div>
 
       <!-- Bookings -->
@@ -102,6 +110,18 @@
         <h3>My bookings</h3>
         <div id="acc-bookings"></div>
       </div>
+    </div>
+
+    <!-- Additional authorized drivers -->
+    <div class="panel" style="margin-top:22px">
+      <div class="panel-head">
+        <div>
+          <h3 style="margin-bottom:2px">Additional authorized drivers</h3>
+          <p style="color:var(--muted);font-size:13px;margin:0">Add a second driver to your rental. Each driver completes the same ID + selfie verification and uploads their license. Note: only you — the account holder who books — may pick up and drop off the vehicle.</p>
+        </div>
+        <button class="abtn gold" style="white-space:nowrap" onclick="startDriver()">+ Add driver</button>
+      </div>
+      <div id="drivers-list" style="margin-top:16px"></div>
     </div>
   </div>
 </div>
@@ -123,6 +143,56 @@
     <div class="amodal-foot">
       <button class="abtn" onclick="closeModal('verify-modal')">Cancel</button>
       <button class="abtn gold" onclick="submitVerify()">Submit for verification</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSURANCE MODAL -->
+<div class="amodal" id="insurance-modal">
+  <div class="amodal-box" style="max-width:480px">
+    <h3>Upload insurance card</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px">Upload a clear photo of the front of your current auto insurance card. On the live site we confirm the policy is valid and unexpired, and the image is stored securely — never public.</p>
+    <div class="afield" style="margin-bottom:14px">
+      <label>Insurance card (front)</label>
+      <input type="file" id="ins-file" accept="image/*">
+    </div>
+    <div class="afield">
+      <label>Policy expiration date</label>
+      <input type="date" id="ins-exp">
+    </div>
+    <div class="notice" id="ins-msg" style="display:none;margin-top:12px"></div>
+    <div class="amodal-foot">
+      <button class="abtn" onclick="closeModal('insurance-modal')">Cancel</button>
+      <button class="abtn gold" onclick="submitInsurance()">Submit insurance card</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DRIVER MODAL -->
+<div class="amodal" id="driver-modal">
+  <div class="amodal-box" style="max-width:500px">
+    <h3>Add authorized driver</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px">This driver will go through the same verification you did. They must upload their driver's license and complete a selfie match. Only you (the person who books) may pick up and drop off the vehicle.</p>
+    <div class="afield" style="margin-bottom:14px">
+      <label>Driver's full name (as on license)</label>
+      <input type="text" id="d-name" placeholder="Full name">
+    </div>
+    <div class="afield" style="margin-bottom:14px">
+      <label>Driver's email</label>
+      <input type="email" id="d-email" placeholder="driver@email.com">
+    </div>
+    <div class="afield" style="margin-bottom:14px">
+      <label>1. Driver's license photo</label>
+      <input type="file" id="d-license" accept="image/*">
+    </div>
+    <div class="afield">
+      <label>2. Selfie</label>
+      <input type="file" id="d-selfie" accept="image/*">
+    </div>
+    <div class="notice" id="d-msg" style="display:none;margin-top:12px"></div>
+    <div class="amodal-foot">
+      <button class="abtn" onclick="closeModal('driver-modal')">Cancel</button>
+      <button class="abtn gold" onclick="submitDriver()">Add &amp; verify driver</button>
     </div>
   </div>
 </div>

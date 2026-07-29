@@ -59,6 +59,8 @@ function showAccount(){
   $('acc-greeting').textContent = `Welcome back, ${c.name.split(' ')[0]}.`;
   $('p-name').value=c.name; $('p-phone').value=c.phone||''; $('p-email').value=c.email;
   renderVerify(c);
+  renderInsurance(c);
+  renderDrivers(c);
   renderAccBookings(c);
 }
 function renderVerify(c){
@@ -66,6 +68,72 @@ function renderVerify(c){
     ? '<span class="pill green">✓ Verified</span> <span style="color:var(--muted);font-size:13px">You\'re cleared to pick up.</span>'
     : '<span class="pill gold">Not verified yet</span>';
   $('verify-btn').style.display = c.verified ? 'none' : 'inline-flex';
+}
+
+/* ---- insurance card ---- */
+function renderInsurance(c){
+  const ins = c.insurance;
+  if(ins && ins.verified){
+    $('ins-status').innerHTML = `<span class="pill green">✓ On file</span> <span style="color:var(--muted);font-size:13px">Valid through ${ins.expiry?fmtDate(ins.expiry):'—'}.</span>`;
+    $('ins-btn').textContent = 'Replace insurance card';
+  } else {
+    $('ins-status').innerHTML = '<span class="pill gold">No insurance card on file</span>';
+    $('ins-btn').textContent = 'Upload insurance card';
+  }
+  $('ins-btn').style.display = 'inline-flex';
+}
+function startInsurance(){ $('ins-msg').style.display='none'; $('ins-file').value=''; $('ins-exp').value=''; $('insurance-modal').classList.add('show'); }
+function submitInsurance(){
+  const file=$('ins-file').files[0], exp=$('ins-exp').value;
+  const msg=$('ins-msg');
+  if(!file){ msg.style.display='block'; msg.className='notice err'; msg.textContent='Please upload a photo of your insurance card.'; return; }
+  if(!exp){ msg.style.display='block'; msg.className='notice err'; msg.textContent='Please enter the policy expiration date.'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  if(exp < today){ msg.style.display='block'; msg.className='notice err'; msg.textContent='That policy has expired. Please upload a current, valid insurance card.'; return; }
+  const c = Store.currentCustomer();
+  // Demo: accept + mark valid. Live version validates policy details with the insurer / OCR.
+  Store.updateCustomer(c.email, { insurance:{ fileName:file.name, expiry:exp, verified:true, uploadedAt:new Date().toISOString() } });
+  closeModal('insurance-modal');
+  toast('Insurance card saved ✓');
+  showAccount();
+}
+
+/* ---- additional authorized drivers ---- */
+function renderDrivers(c){
+  const list = c.drivers || [];
+  $('drivers-list').innerHTML = list.length ? list.map(d=>`
+    <div class="drv">
+      <div class="drv-info">
+        <div class="drv-name">${d.name}</div>
+        <div class="bk-meta">${d.email||''} · ${d.verified?'<span class="pill green">✓ Verified</span>':'<span class="pill gold">Verification pending</span>'}</div>
+      </div>
+      <button class="abtn sm" onclick="removeDriver('${d.id}')">Remove</button>
+    </div>`).join('') : `<div class="empty-state">No additional drivers yet. Only the account holder is authorized to drive unless you add one here.</div>`;
+}
+function startDriver(){
+  ['d-name','d-email'].forEach(id=>$(id).value='');
+  ['d-license','d-selfie'].forEach(id=>$(id).value='');
+  $('d-msg').style.display='none';
+  $('driver-modal').classList.add('show');
+}
+function submitDriver(){
+  const name=$('d-name').value.trim(), email=$('d-email').value.trim();
+  const lic=$('d-license').files[0], self=$('d-selfie').files[0];
+  const msg=$('d-msg');
+  if(!name){ msg.style.display='block'; msg.className='notice err'; msg.textContent='Please enter the driver\'s full name.'; return; }
+  if(!lic || !self){ msg.style.display='block'; msg.className='notice err'; msg.textContent='Please upload the driver\'s license and a selfie.'; return; }
+  const c = Store.currentCustomer();
+  // Demo: same verification flow as the account holder — auto-approve here.
+  Store.addDriver(c.email, { name, email, licenseFile:lic.name, selfieFile:self.name, verified:true, verifiedAt:new Date().toISOString() });
+  closeModal('driver-modal');
+  toast('Authorized driver added & verified ✓');
+  showAccount();
+}
+function removeDriver(id){
+  const c = Store.currentCustomer();
+  Store.removeDriver(c.email, id);
+  toast('Driver removed');
+  showAccount();
 }
 function renderAccBookings(c){
   const list = Store.customerBookings(c.email);

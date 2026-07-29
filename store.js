@@ -147,6 +147,32 @@
     const e = email.trim().toLowerCase();
     return getBookings().filter(b => (b.customer && b.customer.email || '').toLowerCase() === e);
   }
+  // Simple id helper (no Math.random here — keep deterministic-ish per customer)
+  function nextDriverId(cust) {
+    const n = (cust.drivers ? cust.drivers.length : 0) + 1;
+    return 'drv-' + n + '-' + (cust.id || 'c');
+  }
+  // ---- Additional authorized drivers ----
+  // Each driver must complete the same ID + selfie verification. Only the
+  // primary account holder (the person who books) may pick up / drop off.
+  function addDriver(email, driver) {
+    const c = findCustomer(email); if (!c) return null;
+    const drivers = (c.drivers || []).slice();
+    drivers.push(Object.assign({
+      id: nextDriverId(c), verified: false, addedAt: new Date().toISOString()
+    }, driver));
+    return updateCustomer(email, { drivers });
+  }
+  function updateDriver(email, driverId, patch) {
+    const c = findCustomer(email); if (!c) return null;
+    const drivers = (c.drivers || []).map(d => d.id === driverId ? Object.assign({}, d, patch) : d);
+    return updateCustomer(email, { drivers });
+  }
+  function removeDriver(email, driverId) {
+    const c = findCustomer(email); if (!c) return null;
+    const drivers = (c.drivers || []).filter(d => d.id !== driverId);
+    return updateCustomer(email, { drivers });
+  }
   // Demo 2FA: deterministic 6-digit code from email (no Math.random); real version emails/SMS a code.
   function twoFactorCode(email) {
     let h = 0; const s = (email || '') + 'pdr2fa';
@@ -169,6 +195,7 @@
     login, isAuthed, logout, DEMO_PASSWORD,
     DELIVERY, deliveryFee,
     getCustomers, findCustomer, registerCustomer, authCustomer,
-    startSession, endSession, currentCustomer, updateCustomer, customerBookings, twoFactorCode
+    startSession, endSession, currentCustomer, updateCustomer, customerBookings, twoFactorCode,
+    addDriver, updateDriver, removeDriver
   };
 })();
