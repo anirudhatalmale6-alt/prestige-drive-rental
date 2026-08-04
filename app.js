@@ -251,26 +251,41 @@ function initDetail(){
       return;
     }
     const ref = 'PDR-' + car.id.split('-')[0].toUpperCase().slice(0,3) + '-' + String(1000 + (car.model.length*37 + daysBetween(start.value,end.value)*13)).slice(0,4);
-    if(window.Store){
-      const locEl = el('location'), addrEl = el('c-address');
-      Store.addBooking({
-        id: ref,
-        vehicleId: car.id,
-        vehicle: `${car.year} ${car.make} ${car.model}`,
-        customer: { name, email, phone },
-        location: locEl ? locEl.value : '',
-        deliveryAddress: (quote.isDelivery && addrEl) ? addrEl.value.trim() : '',
-        delivery: quote.delivery,
-        start: start.value, end: end.value,
-        days: quote.days, subtotal: quote.subtotal, discount: quote.discount,
-        promo: quote.promo, total: quote.total, deposit: quote.deposit,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      });
+    const locEl = el('location'), addrEl = el('c-address');
+
+    function createBooking(agreement){
+      if(window.Store){
+        Store.addBooking({
+          id: ref,
+          vehicleId: car.id,
+          vehicle: `${car.year} ${car.make} ${car.model}`,
+          customer: { name, email, phone },
+          location: locEl ? locEl.value : '',
+          deliveryAddress: (quote.isDelivery && addrEl) ? addrEl.value.trim() : '',
+          delivery: quote.delivery,
+          start: start.value, end: end.value,
+          days: quote.days, subtotal: quote.subtotal, discount: quote.discount,
+          promo: quote.promo, total: quote.total, deposit: quote.deposit,
+          status: 'pending',
+          agreement: agreement || null,
+          createdAt: new Date().toISOString()
+        });
+      }
+      document.getElementById('m-ref').textContent = ref;
+      document.getElementById('m-dates').textContent = `${start.value} → ${end.value}`;
+      document.getElementById('modal').classList.add('show');
     }
-    document.getElementById('m-ref').textContent = ref;
-    document.getElementById('m-dates').textContent = `${start.value} → ${end.value}`;
-    document.getElementById('modal').classList.add('show');
+
+    // Read / initial / sign / date the rental agreement, then confirm the reservation.
+    if(window.Esign && window.CONTRACT){
+      Esign.open({
+        car, name, email, phone, quote,
+        start: start.value, end: end.value,
+        onComplete: createBooking
+      });
+    } else {
+      createBooking(null);
+    }
   });
   document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal').classList.remove('show'));
   document.getElementById('modal').addEventListener('click',e=>{ if(e.target.id==='modal') e.currentTarget.classList.remove('show'); });

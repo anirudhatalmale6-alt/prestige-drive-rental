@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="esign.css">
 </head>
 <body class="admin">
 
@@ -70,7 +71,7 @@
     <!-- BOOKINGS -->
     <section class="view" id="view-bookings">
       <div class="page-head"><div><h1>Bookings</h1><p>Reservations made through your website.</p></div></div>
-      <div class="panel"><table class="tbl"><thead><tr><th>Ref</th><th>Customer</th><th>Vehicle</th><th>Dates</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="book-rows"></tbody></table></div>
+      <div class="panel"><table class="tbl"><thead><tr><th>Ref</th><th>Customer</th><th>Vehicle</th><th>Dates</th><th>Total</th><th>Agreement</th><th>Status</th><th></th></tr></thead><tbody id="book-rows"></tbody></table></div>
     </section>
 
     <!-- BLOCK DATES -->
@@ -158,8 +159,21 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- SIGNED AGREEMENT MODAL -->
+<div class="amodal" id="agree-modal">
+  <div class="amodal-box" style="max-width:900px;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h3 style="margin:0">Signed rental agreement</h3>
+      <button class="abtn" onclick="closeModal('agree-modal')">Close</button>
+    </div>
+    <div id="agree-body" style="overflow-y:auto;margin-top:14px;background:#3a3d44;padding:16px;border-radius:8px"></div>
+  </div>
+</div>
+
 <script src="data.js"></script>
 <script src="store.js"></script>
+<script src="contract.js"></script>
+<script src="esign.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>

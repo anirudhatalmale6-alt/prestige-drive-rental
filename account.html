@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="account.css">
+<link rel="stylesheet" href="esign.css">
 </head>
 <body class="admin">
 
@@ -197,10 +198,23 @@
   </div>
 </div>
 
+<!-- SIGNED AGREEMENT MODAL -->
+<div class="amodal" id="agree-modal">
+  <div class="amodal-box" style="max-width:900px;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h3 style="margin:0">Your signed rental agreement</h3>
+      <button class="abtn" onclick="closeModal('agree-modal')">Close</button>
+    </div>
+    <div id="agree-body" style="overflow-y:auto;margin-top:14px;background:#3a3d44;padding:16px;border-radius:8px"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="data.js"></script>
 <script src="store.js"></script>
+<script src="contract.js"></script>
+<script src="esign.js"></script>
 <script src="account.js"></script>
 </body>
 </html>

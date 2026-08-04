@@ -171,12 +171,21 @@ function renderBookings(){
       <td>${x.vehicle}</td>
       <td>${fmtDate(x.start)} → ${fmtDate(x.end)}<br><span style="color:var(--muted);font-size:12px">${x.days} day(s)</span></td>
       <td>${money(x.total)}<br><span style="color:var(--muted);font-size:12px">${money(x.deposit)} deposit</span></td>
+      <td>${x.agreement
+        ? `<span class="pill green">✓ Signed</span><br><button class="abtn sm" style="margin-top:6px" onclick="viewAgreement('${x.id}')">View</button>`
+        : `<span class="pill grey">Not signed</span>`}</td>
       <td>${statusPill(x.status)}</td>
       <td><div class="row-actions">
         ${x.status!=='confirmed'?`<button class="abtn sm" onclick="setBooking('${x.id}','confirmed')">Confirm</button>`:''}
         ${x.status!=='cancelled'?`<button class="abtn sm danger" onclick="setBooking('${x.id}','cancelled')">Cancel</button>`:''}
       </div></td>
-    </tr>`).join('') : `<tr><td colspan="7"><div class="empty-state">No bookings yet.</div></td></tr>`;
+    </tr>`).join('') : `<tr><td colspan="8"><div class="empty-state">No bookings yet.</div></td></tr>`;
+}
+function viewAgreement(id){
+  const b = Store.getBookings().find(x=>x.id===id);
+  if(!b || !b.agreement){ toast('No signed agreement on file'); return; }
+  $('agree-body').innerHTML = window.Esign ? Esign.renderSigned(b.agreement) : '<p>Agreement on file.</p>';
+  $('agree-modal').classList.add('show');
 }
 function setBooking(id, status){
   Store.updateBooking(id, {status});

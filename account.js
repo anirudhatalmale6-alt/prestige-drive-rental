@@ -150,7 +150,16 @@ function renderAccBookings(c){
         ${fmtDate(b.start)} → ${fmtDate(b.end)} (${b.days} day${b.days>1?'s':''})<br>
         ${b.location||''}${b.deliveryAddress?(' · '+b.deliveryAddress):''}${b.delivery?(' · delivery '+money(b.delivery)):''}
       </div>
+      ${b.agreement
+        ? `<div class="bk-meta" style="margin-top:8px"><span class="pill green">✓ Agreement signed</span> <a href="#" onclick="viewAgreement('${b.id}');return false;" style="color:var(--gold);margin-left:8px">View agreement</a></div>`
+        : `<div class="bk-meta" style="margin-top:8px"><span class="pill gold">Agreement not signed</span></div>`}
     </div>`).join('') : `<div class="empty-state">No bookings yet.<br><a class="abtn sm" style="margin-top:14px" href="index.html#fleet">Browse the fleet →</a></div>`;
+}
+function viewAgreement(id){
+  const b = Store.getBookings().find(x=>x.id===id);
+  if(!b || !b.agreement){ toast('No signed agreement on file'); return; }
+  $('agree-body').innerHTML = window.Esign ? Esign.renderSigned(b.agreement) : '<p>Agreement on file.</p>';
+  $('agree-modal').classList.add('show');
 }
 function statusPill(s){ const m={pending:'gold',confirmed:'green',cancelled:'red'}; return `<span class="pill ${m[s]||'grey'}">${s}</span>`; }
 
