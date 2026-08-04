@@ -175,7 +175,7 @@ function initDetail(){
     const isDelivery = /delivery/i.test(loc);
     const delivery = (isDelivery && window.Store) ? Store.deliveryFee(days) : 0;
     const total = subtotal - discount + delivery;
-    const deposit = Math.round(total * 0.25);
+    const deposit = (window.Store ? Store.depositAmount(total) : Math.round(total * 0.30));
     quote = { days, subtotal, discount, delivery, isDelivery, total, deposit, promo: appliedPromo ? appliedPromo.code : null };
     el('s-days').textContent = `${money(car.price)} × ${days} day${days>1?'s':''}`;
     el('s-subtotal').textContent = money(subtotal);

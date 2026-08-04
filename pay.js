@@ -1,6 +1,6 @@
 /* pay.js — payment step for the Prime Deals Rental booking flow.
-   Options: pay the 25% deposit now, pay in full now, send a secure pay-link to
-   the customer's phone, or pay in person at pickup.
+   Options: place the 30% deposit hold (auth-only, captured at pickup), pay in full
+   now, send a secure pay-link to the customer's phone, or pay in person at pickup.
 
    DEMO MODE (PAY_CONFIG.mode='demo'): shows a Converge-style secure card window and
    simulates approval so the whole flow is clickable with no backend.
@@ -17,7 +17,8 @@
 (function () {
   window.PAY_CONFIG = window.PAY_CONFIG || {
     mode: 'demo',                 // 'demo' | 'live'
-    depositType: 'charge',        // 'charge' (capture 25% now) | 'hold' (auth-only, capture at pickup)
+    depositType: 'hold',          // 'hold' (30% auth-only, captured at pickup) | 'charge' (capture now)
+    depositLabel: '30%',          // shown in the UI
     tokenEndpoint: '/api/converge/token',   // your backend (live mode)
     checkoutJs: 'https://api.convergepay.com/hosted-payments/Checkout.js'
   };
@@ -62,7 +63,7 @@
             <div class="veh">${esc(b.vehicle||'')}</div>
             ${b.dates?`<div class="row"><span>Dates</span><span>${esc(b.dates)}</span></div>`:''}
             <div class="row"><span>Rental total</span><b>${money(opts.total)}</b></div>
-            <div class="row"><span>25% deposit</span><b>${money(opts.deposit)}</b></div>
+            <div class="row"><span>${PAY_CONFIG.depositLabel} deposit${PAY_CONFIG.depositType==='hold'?' (hold)':''}</span><b>${money(opts.deposit)}</b></div>
           </div>
           <div id="pay-stage"></div>
         </div>
@@ -70,6 +71,7 @@
   }
 
   function amountNow(){ return S.amountType==='deposit' ? S.opts.deposit : S.opts.total; }
+  function isHoldNow(){ return S.amountType==='deposit' && PAY_CONFIG.depositType==='hold'; }
 
   // ---------- stage 1: choose amount + method ----------
   function renderChoose(){
@@ -78,14 +80,16 @@
     o.querySelector('#pay-stage').innerHTML = `
       <div class="pay-amt-toggle">
         <button class="pay-amt ${S.amountType==='deposit'?'on':''}" data-amt="deposit">
-          <span class="lbl">Deposit (25%)</span><span class="val">${money(dep)}</span></button>
+          <span class="lbl">Deposit (${PAY_CONFIG.depositLabel}${PAY_CONFIG.depositType==='hold'?' hold':''})</span><span class="val">${money(dep)}</span></button>
         <button class="pay-amt ${S.amountType==='full'?'on':''}" data-amt="full">
           <span class="lbl">Pay in full</span><span class="val">${money(full)}</span></button>
       </div>
       <div class="pay-methods">
         <button class="pay-method" data-method="card">
           <span class="ic">💳</span>
-          <span><span class="m-title">Pay ${'now'} by card</span><span class="m-sub">Secure card window — pay your ${S.amountType==='deposit'?'deposit':'balance'} of <b id="m-amt">${money(amountNow())}</b> online</span></span>
+          <span><span class="m-title">${isHoldNow()?'Authorize card (hold)':'Pay now by card'}</span><span class="m-sub">${isHoldNow()
+              ? `Secure card window — place a <b id="m-amt">${money(amountNow())}</b> hold, captured at pickup`
+              : `Secure card window — pay your ${S.amountType==='deposit'?'deposit':'balance'} of <b id="m-amt">${money(amountNow())}</b> online`}</span></span>
         </button>
         <button class="pay-method" data-method="link">
           <span class="ic">📲</span>
@@ -133,7 +137,7 @@
             <div class="pc-field"><label>ZIP</label><input id="pc-zip" inputmode="numeric" placeholder="60634" maxlength="10"></div>
           </div>
           <div class="pc-field"><label>Name on card</label><input id="pc-name" placeholder="Full name" value="${esc(S.opts.booking&&S.opts.booking.name||'')}"></div>
-          <button class="btn btn-gold btn-block pay-btn" id="pc-pay">Pay ${money(amountNow())}</button>
+          <button class="btn btn-gold btn-block pay-btn" id="pc-pay">${isHoldNow()?('Authorize '+money(amountNow())+' hold'):('Pay '+money(amountNow()))}</button>
           <div class="pay-err" id="pc-err"></div>
           <div class="pay-note"><span>🔒</span><span>Your card details are entered in a secure window and are never stored on our servers. ${PAY_CONFIG.depositType==='hold'&&S.amountType==='deposit'?'A hold is placed now and captured at pickup.':'Your card is charged now.'}</span></div>
           ${PAY_CONFIG.mode==='demo'?`<div class="pay-demo-hint">Demo mode — use test card <code>4111 1111 1111 1111</code>, any future expiry &amp; any CVV. (Card <code>4000 0000 0000 0002</code> simulates a decline.)</div>`:''}

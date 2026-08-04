@@ -38,13 +38,20 @@ server's `.env`, never in the site):
 sure where to find them, your Elavon rep can point you to the hosted-payments
 API user; I can walk you through it too.)
 
-## Deposit: charge now vs hold at pickup
-In `pay.js`, `PAY_CONFIG.depositType` controls the deposit behaviour:
-- `'charge'` — the 25% deposit is charged immediately (`ccsale`).
-- `'hold'`   — a hold/authorization is placed now (`ccauthonly`) and captured at
-  pickup via `/api/converge/capture` (`cccomplete`).
+## Deposit: 30% auth-only hold (configured default)
+Per your preference, the deposit is a **30% authorization-only hold** — no money
+moves at booking. In `pay.js`:
+- `PAY_CONFIG.depositType = 'hold'` — a 30% hold/authorization is placed now
+  (`ccauthonly`) and captured at pickup via `/api/converge/capture` (`cccomplete`).
+- `PAY_CONFIG.depositLabel = '30%'`.
 
+(Switching `depositType` to `'charge'` would instead capture the deposit
+immediately with `ccsale` — left in place in case you ever want it.)
 Full-payment and paying the balance always use `ccsale`.
+
+Note on holds: card authorizations typically expire in ~5–7 days if not captured
+(the exact window depends on the cardholder's bank). For rentals booked further
+out, we re-authorize closer to pickup — I'll wire that scheduling in when we go live.
 
 ## Run it
 ```bash

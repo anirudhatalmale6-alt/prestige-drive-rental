@@ -17,6 +17,10 @@
   const DELIVERY = { radiusMiles: 10, feeUnderMin: 120, freeMinDays: 3 };
   function deliveryFee(days) { return days >= DELIVERY.freeMinDays ? 0 : DELIVERY.feeUnderMin; }
 
+  /* Deposit (business rule): 30% auth-only hold, captured at pickup. */
+  const DEPOSIT = { rate: 0.30, type: 'hold' };
+  function depositAmount(total) { return Math.round(total * DEPOSIT.rate); }
+
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
     catch (e) { return fallback; }
@@ -193,7 +197,7 @@
     getPromos, savePromos, findActivePromo, applyPromo,
     overlaps, rangesFor, isUnavailable,
     login, isAuthed, logout, DEMO_PASSWORD,
-    DELIVERY, deliveryFee,
+    DELIVERY, deliveryFee, DEPOSIT, depositAmount,
     getCustomers, findCustomer, registerCustomer, authCustomer,
     startSession, endSession, currentCustomer, updateCustomer, customerBookings, twoFactorCode,
     addDriver, updateDriver, removeDriver
