@@ -267,6 +267,7 @@ function initDetail(){
           days: quote.days, subtotal: quote.subtotal, discount: quote.discount,
           promo: quote.promo, total: quote.total, deposit: quote.deposit,
           status: 'pending',
+          addDriver: !!(el('add-driver') && el('add-driver').checked),
           agreement: agreement || null,
           createdAt: new Date().toISOString()
         });
@@ -281,6 +282,7 @@ function initDetail(){
       Esign.open({
         car, name, email, phone, quote,
         start: start.value, end: end.value,
+        addDriver: !!(el('add-driver') && el('add-driver').checked),
         onComplete: createBooking
       });
     } else {

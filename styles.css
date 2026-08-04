@@ -246,6 +246,9 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding:60px 0 30
 .notice.ok{background:rgba(126,224,167,.1);color:#7ee0a7;border:1px solid rgba(126,224,167,.3)}
 .verify-note{display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:12.5px;color:var(--muted)}
 .verify-note .ic{color:var(--gold);flex:none}
+.add-driver-opt{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2,rgba(255,255,255,.02));cursor:pointer;font-size:12.5px;color:var(--muted);line-height:1.5}
+.add-driver-opt input{margin-top:2px;width:17px;height:17px;accent-color:var(--gold);flex:none;cursor:pointer}
+.add-driver-opt b{color:var(--text)}
 
 /* ---------- Modal ---------- */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
