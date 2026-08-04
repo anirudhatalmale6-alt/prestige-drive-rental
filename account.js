@@ -153,6 +153,7 @@ function renderAccBookings(c){
       ${b.agreement
         ? `<div class="bk-meta" style="margin-top:8px"><span class="pill green">✓ Agreement signed</span> <a href="#" onclick="viewAgreement('${b.id}');return false;" style="color:var(--gold);margin-left:8px">View agreement</a></div>`
         : `<div class="bk-meta" style="margin-top:8px"><span class="pill gold">Agreement not signed</span></div>`}
+      <div class="bk-meta" style="margin-top:6px">${b.payment ? ('💳 ' + (window.Pay?Pay.label(b.payment):'Payment on file')) : '💳 Payment pending'}</div>
     </div>`).join('') : `<div class="empty-state">No bookings yet.<br><a class="abtn sm" style="margin-top:14px" href="index.html#fleet">Browse the fleet →</a></div>`;
 }
 function viewAgreement(id){

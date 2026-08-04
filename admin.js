@@ -170,7 +170,7 @@ function renderBookings(){
       <td>${x.customer?.name||'—'}<br><span style="color:var(--muted);font-size:12px">${x.customer?.email||''}</span></td>
       <td>${x.vehicle}</td>
       <td>${fmtDate(x.start)} → ${fmtDate(x.end)}<br><span style="color:var(--muted);font-size:12px">${x.days} day(s)</span></td>
-      <td>${money(x.total)}<br><span style="color:var(--muted);font-size:12px">${money(x.deposit)} deposit</span></td>
+      <td>${money(x.total)}<br><span style="color:var(--muted);font-size:12px">${money(x.deposit)} deposit</span><br><span style="font-size:12px;color:${payColor(x.payment)}">${payText(x.payment)}</span></td>
       <td>${x.agreement
         ? `<span class="pill green">✓ Signed</span><br><button class="abtn sm" style="margin-top:6px" onclick="viewAgreement('${x.id}')">View</button>`
         : `<span class="pill grey">Not signed</span>`}</td>
@@ -180,6 +180,13 @@ function renderBookings(){
         ${x.status!=='cancelled'?`<button class="abtn sm danger" onclick="setBooking('${x.id}','cancelled')">Cancel</button>`:''}
       </div></td>
     </tr>`).join('') : `<tr><td colspan="8"><div class="empty-state">No bookings yet.</div></td></tr>`;
+}
+function payText(p){ return (window.Pay && p) ? Pay.label(p) : (p?'Payment on file':'Unpaid'); }
+function payColor(p){
+  if(!p) return '#c0392b';
+  if(p.status==='paid') return '#4fbf72';
+  if(p.status==='authorized'||p.status==='link_sent') return 'var(--gold-2,#d9be7e)';
+  return 'var(--muted)';
 }
 function viewAgreement(id){
   const b = Store.getBookings().find(x=>x.id===id);

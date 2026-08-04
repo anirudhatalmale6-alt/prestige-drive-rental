@@ -253,7 +253,7 @@ function initDetail(){
     const ref = 'PDR-' + car.id.split('-')[0].toUpperCase().slice(0,3) + '-' + String(1000 + (car.model.length*37 + daysBetween(start.value,end.value)*13)).slice(0,4);
     const locEl = el('location'), addrEl = el('c-address');
 
-    function createBooking(agreement){
+    function createBooking(agreement, payment){
       if(window.Store){
         Store.addBooking({
           id: ref,
@@ -269,24 +269,41 @@ function initDetail(){
           status: 'pending',
           addDriver: !!(el('add-driver') && el('add-driver').checked),
           agreement: agreement || null,
+          payment: payment || null,
           createdAt: new Date().toISOString()
         });
       }
       document.getElementById('m-ref').textContent = ref;
       document.getElementById('m-dates').textContent = `${start.value} → ${end.value}`;
+      const payLine = document.getElementById('m-pay');
+      if(payLine) payLine.textContent = (payment && window.Pay) ? ('Payment: ' + Pay.label(payment)) : '';
       document.getElementById('modal').classList.add('show');
     }
 
-    // Read / initial / sign / date the rental agreement, then confirm the reservation.
+    // After signing, take payment (deposit / full / pay-link / at pickup), then confirm.
+    function takePayment(agreement){
+      if(window.Pay){
+        Pay.open({
+          total: quote.total, deposit: quote.deposit, currency: 'USD',
+          booking: { ref, vehicle: `${car.year} ${car.make} ${car.model}`,
+                     dates: `${start.value} → ${end.value}`, name, email, phone },
+          onComplete: function(payment){ createBooking(agreement, payment); }
+        });
+      } else {
+        createBooking(agreement, null);
+      }
+    }
+
+    // Read / initial / sign / date the rental agreement, then pay.
     if(window.Esign && window.CONTRACT){
       Esign.open({
         car, name, email, phone, quote,
         start: start.value, end: end.value,
         addDriver: !!(el('add-driver') && el('add-driver').checked),
-        onComplete: createBooking
+        onComplete: takePayment
       });
     } else {
-      createBooking(null);
+      takePayment(null);
     }
   });
   document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal').classList.remove('show'));
